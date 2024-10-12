@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Ventas de Productos Electrónicos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1> Ventas</h1>
+
+    <!-- Tabla de productos -->
+    <h2>Inventario </h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody id="productosTableBody">
+            <!-- Aquí se llenará con JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Formulario de ventas -->
+    <h2>Agregar Venta</h2>
+    <div class="form-group">
+        <label for="productoId">Producto ID:</label>
+        <input type="number" id="productoId" min="1" required>
+    </div>
+    <div class="form-group">
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" min="1" required>
+    </div>
+    <button onclick="agregarVenta()">Agregar Venta</button>
+
+    <!-- Tabla de ventas -->
+    <h2>Ventas Realizadas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="ventasTableBody">
+            <!-- Aquí se llenará con JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+// JSON de productos y ventas
+let inventario = {
+    "productos": [
+        { "id": 1, "nombre": "Laptop", "precio": 1000, "stock": 50 },
+        { "id": 2, "nombre": "Smartphone", "precio": 700, "stock": 30 },
+        { "id": 3, "nombre": "Tablet", "precio": 500, "stock": 20 },
+        { "id": 4, "nombre": "Smartwatch", "precio": 300, "stock": 15 },
+        { "id": 5, "nombre": "Auriculares", "precio": 150, "stock": 40 }
+    ],
+    "ventas": []
+};
+
+// Mostrar productos en la tabla
+function cargarProductos() {
+    let productosTableBody = document.getElementById("productosTableBody");
+    productosTableBody.innerHTML = "";
+    inventario.productos.forEach(producto => {
+        productosTableBody.innerHTML += `
+            <tr>
+                <td>${producto.id}</td>
+                <td>${producto.nombre}</td>
+                <td>$${producto.precio}</td>
+                <td>${producto.stock}</td>
+            </tr>
+        `;
+    });
+}
+
+// Agregar una venta
+function agregarVenta() {
+    let productoId = parseInt(document.getElementById("productoId").value);
+    let cantidad = parseInt(document.getElementById("cantidad").value);
+    
+    let producto = inventario.productos.find(p => p.id === productoId);
+    
+    if (producto && producto.stock >= cantidad) {
+        producto.stock -= cantidad;
+        let nuevaVenta = {
+            id: inventario.ventas.length + 1,
+            productoId: productoId,
+            cantidad: cantidad,
+            total: producto.precio * cantidad
+        };
+        inventario.ventas.push(nuevaVenta);
+        cargarProductos();  // Actualizar la tabla de productos
+        cargarVentas();     // Actualizar la tabla de ventas
+        console.log("Venta agregada con éxito.");
+    } else {
+        alert("Stock insuficiente o producto no encontrado.");
+    }
+}
+
+// Mostrar ventas en la tabla
+function cargarVentas() {
+    let ventasTableBody = document.getElementById("ventasTableBody");
+    ventasTableBody.innerHTML = "";
+    inventario.ventas.forEach(venta => {
+        let producto = inventario.productos.find(p => p.id === venta.productoId);
+        ventasTableBody.innerHTML += `
+            <tr>
+                <td>${venta.id}</td>
+                <td>${producto.nombre}</td>
+                <td>${venta.cantidad}</td>
+                <td>$${venta.total}</td>
+                <td><button onclick="eliminarVenta(${venta.id})">Eliminar</button></td>
+            </tr>
+        `;
+    });
+}
+
+// Eliminar una venta
+function eliminarVenta(ventaId) {
+    let ventaIndex = inventario.ventas.findIndex(v => v.id === ventaId);
+    if (ventaIndex !== -1) {
+        let venta = inventario.ventas[ventaIndex];
+        let producto = inventario.productos.find(p => p.id === venta.productoId);
+        producto.stock += venta.cantidad;  // Devolver el stock
+        inventario.ventas.splice(ventaIndex, 1);  // Eliminar la venta
+        cargarProductos();  // Actualizar la tabla de productos
+        cargarVentas();     // Actualizar la tabla de ventas
+        console.log("Venta eliminada con éxito.");
+    } else {
+        alert("Venta no encontrada.");
+    }
+}
+
+// Inicializar las tablas al cargar la página
+window.onload = function() {
+    cargarProductos();
+    cargarVentas();
+}
+</script>
+
+</body>
+</html>
