@@ -7,6 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #8a770e; /* Color de fondo de la página */
         }
         .container {
             margin: 20px;
@@ -17,24 +18,46 @@
             margin-bottom: 20px;
         }
         table, th, td {
-            border: 1px solid black;
+            border: 1px solid #333; /* Bordes oscuros para mejor visibilidad */
         }
-        th, td {
+        th {
+            background-color: #4CAF50; /* Fondo verde para los encabezados */
+            color: white; /* Texto blanco para los encabezados */
+            padding: 10px;
+        }
+        td {
             padding: 8px;
             text-align: center;
         }
+        /* Estilo para alternar colores de las filas */
+        tr:nth-child(even) {
+            background-color: #962c2c; /* Fondo gris claro para las filas pares */
+        }
+        tr:nth-child(odd) {
+            background-color: #ffffff; /* Fondo blanco para las filas impares */
+        }
         .form-group {
             margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0d0e0d;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1> Ventas</h1>
+    <h1>Gestión de Ventas</h1>
 
     <!-- Tabla de productos -->
-    <h2>Inventario </h2>
+    <h2>Inventario de Productos</h2>
     <table>
         <thead>
             <tr>
@@ -50,7 +73,17 @@
     </table>
 
     <!-- Formulario de ventas -->
-    <h2>Agregar Venta</h2>
+    <h2>Agregar Ventas</h2>
+
+
+    <div class="form-group">
+        <label for="nombreCliente">Nombre del Cliente:</label>
+        <input type="text" id="nombreCliente" required>
+    </div>
+    <div class="form-group">
+        <label for="telefonoCliente">Teléfono del Cliente:</label>
+        <input type="text" id="telefonoCliente" required>
+    </div>
     <div class="form-group">
         <label for="productoId">Producto ID:</label>
         <input type="number" id="productoId" min="1" required>
@@ -59,6 +92,7 @@
         <label for="cantidad">Cantidad:</label>
         <input type="number" id="cantidad" min="1" required>
     </div>
+    
     <button onclick="agregarVenta()">Agregar Venta</button>
 
     <!-- Tabla de ventas -->
@@ -66,6 +100,8 @@
     <table>
         <thead>
             <tr>
+                <th>Cliente</th>
+                <th>Teléfono</th>
                 <th>ID</th>
                 <th>Producto</th>
                 <th>Cantidad</th>
@@ -112,6 +148,8 @@ function cargarProductos() {
 function agregarVenta() {
     let productoId = parseInt(document.getElementById("productoId").value);
     let cantidad = parseInt(document.getElementById("cantidad").value);
+    let nombreCliente = document.getElementById("nombreCliente").value;
+    let telefonoCliente = document.getElementById("telefonoCliente").value;
     
     let producto = inventario.productos.find(p => p.id === productoId);
     
@@ -121,7 +159,11 @@ function agregarVenta() {
             id: inventario.ventas.length + 1,
             productoId: productoId,
             cantidad: cantidad,
-            total: producto.precio * cantidad
+            total: producto.precio * cantidad,
+            cliente: {
+                nombre: nombreCliente,
+                telefono: telefonoCliente
+            }
         };
         inventario.ventas.push(nuevaVenta);
         cargarProductos();  // Actualizar la tabla de productos
@@ -144,6 +186,8 @@ function cargarVentas() {
                 <td>${producto.nombre}</td>
                 <td>${venta.cantidad}</td>
                 <td>$${venta.total}</td>
+                <td>${venta.cliente.nombre}</td>
+                <td>${venta.cliente.telefono}</td>
                 <td><button onclick="eliminarVenta(${venta.id})">Eliminar</button></td>
             </tr>
         `;
